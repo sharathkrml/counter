@@ -18,19 +18,23 @@ def verify_token(authorization: str | None = Header(default=None)) -> None:
 
 @router.get("/counter", response_model=CounterResponse, dependencies=[Depends(verify_token)])
 def get_counter():
+    print("Getting counter")
     return CounterResponse(count=counter_service.get_count())
 
 
 @router.post("/counter/increment", response_model=CounterResponse, dependencies=[Depends(verify_token)])
 def increment():
+    print("Incrementing counter")
     return CounterResponse(count=counter_service.increment())
 
 
 @router.post("/counter/decrement", response_model=CounterResponse, dependencies=[Depends(verify_token)])
 def decrement():
+    print("Decrementing counter")
     return CounterResponse(count=counter_service.decrement())
 
 
 @router.post("/counter/reset", response_model=CounterResponse, dependencies=[Depends(verify_token)])
 def reset():
+    print("Resetting counter")
     return CounterResponse(count=counter_service.reset())

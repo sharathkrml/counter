@@ -4,7 +4,7 @@
 //
 
 import Foundation
-import Combine
+public import Combine
 import AppKit
 import Darwin
 
@@ -33,6 +33,7 @@ final class BackendManager: ObservableObject {
 
     private var process: Process?
     private var stdoutTask: Task<Void, Never>?
+    private var stderrTask: Task<Void, Never>?
     private var terminateObserver: NSObjectProtocol?
 
     private let pythonPath: String
@@ -83,12 +84,24 @@ final class BackendManager: ObservableObject {
             let handle = outPipe.fileHandleForReading
             do {
                 for try await line in handle.bytes.lines {
+                    print("[backend] \(line)")
                     if line.contains("READY port=") {
                         let parts = line.split(separator: "=")
                         if let last = parts.last, let p = Int(last.trimmingCharacters(in: .whitespaces)) {
                             await MainActor.run { self?.port = p }
                         }
                     }
+                }
+            } catch {
+                // ignore
+            }
+        }
+
+        stderrTask = Task {
+            let handle = errPipe.fileHandleForReading
+            do {
+                for try await line in handle.bytes.lines {
+                    print("[backend] \(line)")
                 }
             } catch {
                 // ignore
@@ -140,6 +153,8 @@ final class BackendManager: ObservableObject {
     func stop() {
         stdoutTask?.cancel()
         stdoutTask = nil
+        stderrTask?.cancel()
+        stderrTask = nil
         if let proc = process, proc.isRunning {
             proc.terminate()
             // wait briefly

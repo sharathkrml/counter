@@ -4,7 +4,7 @@
 //
 
 import Foundation
-import Combine
+public import Combine
 
 @MainActor
 final class CounterViewModel: ObservableObject {

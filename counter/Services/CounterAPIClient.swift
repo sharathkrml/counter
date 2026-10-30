@@ -19,15 +19,16 @@ enum APIClientError: Error, LocalizedError {
     }
 }
 
-final class CounterAPIClient: Sendable {
+@MainActor
+final class CounterAPIClient {
     private let session: URLSession
-    private let baseURLProvider: @Sendable () -> URL?
-    private let tokenProvider: @Sendable () -> String
+    private let baseURLProvider: () -> URL?
+    private let tokenProvider: () -> String
 
     init(
         session: URLSession = .shared,
-        baseURLProvider: @escaping @Sendable () -> URL?,
-        tokenProvider: @escaping @Sendable () -> String
+        baseURLProvider: @escaping () -> URL?,
+        tokenProvider: @escaping () -> String
     ) {
         self.session = session
         self.baseURLProvider = baseURLProvider
@@ -40,8 +41,10 @@ final class CounterAPIClient: Sendable {
         var req = URLRequest(url: url)
         req.httpMethod = method
         req.setValue("Bearer \(tokenProvider())", forHTTPHeaderField: "Authorization")
+        print("[api] \(method) \(url.absoluteString)")
         let (data, response) = try await session.data(for: req)
         guard let http = response as? HTTPURLResponse else { throw APIClientError.badResponse(-1) }
+        print("[api] -> \(http.statusCode) \(String(data: data, encoding: .utf8) ?? "")")
         return (data, http)
     }
 
