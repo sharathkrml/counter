@@ -1,0 +1,9 @@
+[project]
+name = "counter-backend"
+version = "1.0.0"
+description = "CounterApp backend sidecar"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

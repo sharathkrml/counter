@@ -2,13 +2,13 @@
 //  counterApp.swift
 //  counter
 //
-//  Created by Sharath V on 30/10/26.
-//
 
 import SwiftUI
 
 @main
 struct counterApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     var body: some Scene {
         WindowGroup {
             ContentView()

@@ -1,0 +1,12 @@
+backend/.venv/
+backend/data/
+build/
+.DS_Store
+*.xcuserstate
+xcuserdata/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
